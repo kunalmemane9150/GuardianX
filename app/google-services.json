@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "926533714151",
+    "project_id": "guardianx-v1",
+    "storage_bucket": "guardianx-v1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926533714151:android:c64ae0c0078082a77da242",
+        "android_client_info": {
+          "package_name": "in.newgenai.guardianx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "926533714151-hbpmke2ufe4b0km9757tooc5n69uecm5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5KR3GgFQOu2PFkJkeNf_FdymZP1_qTTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "926533714151-hbpmke2ufe4b0km9757tooc5n69uecm5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment.CallFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="scroll"
+        android:layout_marginBottom="80dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ambulanceLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#0F55FF00"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_ambulance"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="108"
+                            android:textColor="#309B24"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ambulance"
+                            android:textSize="16dp"
+                            android:textColor="#309B24"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:id="@+id/ambulanceBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/callNHLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#0FFF6A00"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_helpline"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="112"
+                            android:textColor="#D14014"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="National helpline"
+                            android:textSize="16dp"
+                            android:textColor="#D14014"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:contentDescription="call button"
+                                android:id="@+id/callNHBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/policeLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#0F0046FF"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_police"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="100"
+                            android:textColor="#28459F"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Police"
+                            android:textSize="16dp"
+                            android:textColor="#28459F"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:contentDescription="call button"
+                                android:id="@+id/policeBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/childLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#FAF9EE"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_child"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="1098"
+                            android:textColor="#B19400"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Child helpline"
+                            android:textSize="16dp"
+                            android:textColor="#B19400"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:id="@+id/childBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/womenLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#0FA93470"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_women"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="1091"
+                            android:textColor="#D114B2"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Women helpline"
+                            android:textSize="16dp"
+                            android:textColor="#D114B2"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:contentDescription="call button"
+                                android:id="@+id/womenBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/fireLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#0FFF0000"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_fire"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="101"
+                            android:textColor="#D11414"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fire Service"
+                            android:textSize="16dp"
+                            android:textColor="#D11414"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:contentDescription="call button"
+                                android:id="@+id/fireBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/railLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:backgroundTint="#1A000000"
+                    android:background="@drawable/background_call"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginTop="14dp">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_railway"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins"
+                            android:gravity="center_vertical"
+                            android:text="182"
+                            android:textColor="#000000"
+                            android:textSize="22sp"
+                            android:layout_marginStart="6dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rail Protection"
+                            android:textSize="16dp"
+                            android:textColor="#000"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/poppins"
+                            android:layout_marginStart="6dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:gravity="end">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:layout_marginEnd="14dp">
+
+                            <ImageButton
+                                android:id="@+id/railBtn"
+                                android:layout_width="46dp"
+                                android:layout_height="46dp"
+                                android:background="@drawable/background_call_icon"
+                                android:src="@drawable/ic_call_white" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
