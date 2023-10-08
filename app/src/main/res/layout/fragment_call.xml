@@ -526,9 +526,7 @@
                     android:layout_height="110dp"
                     android:backgroundTint="#1A000000"
                     android:background="@drawable/background_call"
-                    android:layout_marginStart="14dp"
-                    android:layout_marginEnd="14dp"
-                    android:layout_marginTop="14dp">
+                    android:layout_margin="14dp">
 
                     <ImageView
                         android:layout_width="0dp"

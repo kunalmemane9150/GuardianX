@@ -16,12 +16,11 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.READ_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -33,6 +32,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GuardianX"
         tools:targetApi="31">
+        <activity
+            android:name=".MenuBarActivity"
+            android:exported="false" />
         <activity
             android:name=".LocationPermissionActivity"
             android:exported="false" />
@@ -61,7 +63,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".SpeechServices"/>
+        <service android:name=".SpeechServices" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

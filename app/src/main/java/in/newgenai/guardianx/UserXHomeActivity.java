@@ -7,16 +7,21 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.CompositePageTransformer;
+import androidx.viewpager2.widget.MarginPageTransformer;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
 import android.content.Context;
@@ -36,6 +41,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
@@ -43,6 +49,7 @@ import android.speech.SpeechRecognizer;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -52,6 +59,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -73,6 +81,8 @@ import in.newgenai.guardianx.Fragment.CallFragment;
 import in.newgenai.guardianx.Fragment.ChatFragment;
 import in.newgenai.guardianx.Fragment.MapFragment;
 import in.newgenai.guardianx.Fragment.ProfileFragment;
+import in.newgenai.guardianx.Slider.SliderAdapter;
+import in.newgenai.guardianx.Slider.SliderItem;
 import in.newgenai.guardianx.databinding.ActivityMainBinding;
 import in.newgenai.guardianx.databinding.ActivityUserXhomeBinding;
 
@@ -106,6 +116,10 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     //vibrate
     private Vibrator vibrator;
 
+    //image slider
+    private ViewPager2 viewPager2;
+    private Handler sliderHandler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +131,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         init();
         onClickListener();
 //        checkPermissions();
+        imageSlider();
         requestPermissions();
         replaceFragment(new MapFragment());
 
@@ -128,24 +143,31 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                 binding.fragmentTitleDesc.setText("Share live location with your Guardian");
                 binding.topView2.setVisibility(View.GONE);
                 binding.topView.setVisibility(View.VISIBLE);
+                binding.viewPagerImageSlider.setVisibility(View.VISIBLE);
+
             } else if (itemId == R.id.call) {
                 replaceFragment(new CallFragment());
                 binding.fragmentTitle.setText("Call For Help");
                 binding.fragmentTitleDesc.setText("In case of an emergency, call an appropriate number for help.");
                 binding.topView2.setVisibility(View.GONE);
                 binding.topView.setVisibility(View.VISIBLE);
+                binding.viewPagerImageSlider.setVisibility(View.GONE);
+
             } else if (itemId == R.id.chat) {
                 replaceFragment(new ChatFragment());
                 binding.fragmentTitle.setText("Chat With Guardian");
                 binding.fragmentTitleDesc.setText("Start a one-to-one chat with your guardian.");
                 binding.topView2.setVisibility(View.VISIBLE);
                 binding.topView.setVisibility(View.VISIBLE);
+                binding.viewPagerImageSlider.setVisibility(View.GONE);
+
             } else if (itemId == R.id.profile) {
                 replaceFragment(new ProfileFragment());
                 binding.fragmentTitle.setText("Your Profile");
                 binding.fragmentTitleDesc.setText("Take a look at your profile, be updated.");
                 binding.topView2.setVisibility(View.GONE);
                 binding.topView.setVisibility(View.GONE);
+                binding.viewPagerImageSlider.setVisibility(View.GONE);
             }
             return true;
         });
@@ -157,6 +179,8 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         user = FirebaseAuth.getInstance().getCurrentUser();
         firebaseAuth = FirebaseAuth.getInstance();
         getPhoneNumberFromFirebase();
+
+        viewPager2 = binding.viewPagerImageSlider;
 
 
         activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
@@ -245,6 +269,15 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         });
 
         binding.hamIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(UserXHomeActivity.this, MenuBarActivity.class));
+
+            }
+        });
+
+        binding.notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showDialogBox();
@@ -477,6 +510,56 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     }
 
 
+    //Image Slider
+    private void imageSlider(){
+        List<SliderItem> sliderItemList = new ArrayList<>();
+        sliderItemList.add(new SliderItem(R.drawable.ic_child));
+        sliderItemList.add(new SliderItem(R.drawable.ic_women));
+        sliderItemList.add(new SliderItem(R.drawable.ic_police));
+        sliderItemList.add(new SliderItem(R.drawable.ic_ambulance));
 
+        viewPager2.setAdapter(new SliderAdapter(sliderItemList,viewPager2));
+        viewPager2.setClipToPadding(false);
+        viewPager2.setClipChildren(false);
+        viewPager2.setOffscreenPageLimit(3);
+        viewPager2.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
 
+        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
+        compositePageTransformer.addTransformer(new MarginPageTransformer(40));
+        compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
+            @Override
+            public void transformPage(@NonNull View page, float position) {
+                float r = 1-Math.abs(position);
+                page.setScaleY(0.85f+r*0.15f);
+            }
+        });
+        viewPager2.setPageTransformer(compositePageTransformer);
+        viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                sliderHandler.removeCallbacks(sliderRunnable);
+                sliderHandler.postDelayed(sliderRunnable,3500);
+            }
+        });
+    }
+
+    private Runnable sliderRunnable = new Runnable() {
+        @Override
+        public void run() {
+            viewPager2.setCurrentItem(viewPager2.getCurrentItem()+1);
+        }
+    };
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sliderHandler.removeCallbacks(sliderRunnable);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sliderHandler.postDelayed(sliderRunnable,3500);
+    }
 }
