@@ -1,32 +1,30 @@
 package in.newgenai.guardianx;
 
-import static android.location.LocationManager.GPS_PROVIDER;
+import static java.security.AccessController.getContext;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
@@ -41,28 +39,30 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
+import android.provider.Settings;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -72,18 +72,20 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.io.File;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
+import in.newgenai.guardianx.Features.TakeSnaps;
 import in.newgenai.guardianx.Fragment.CallFragment;
 import in.newgenai.guardianx.Fragment.ChatFragment;
 import in.newgenai.guardianx.Fragment.MapFragment;
 import in.newgenai.guardianx.Fragment.ProfileFragment;
+import in.newgenai.guardianx.Services.RecordingService;
 import in.newgenai.guardianx.Slider.SliderAdapter;
 import in.newgenai.guardianx.Slider.SliderItem;
-import in.newgenai.guardianx.databinding.ActivityMainBinding;
 import in.newgenai.guardianx.databinding.ActivityUserXhomeBinding;
 
 public class UserXHomeActivity extends AppCompatActivity implements LocationListener, SensorEventListener {
@@ -103,6 +105,9 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     private boolean isRecordPermissionGranted = false;
     private boolean isSMSPermissionGranted = false;
     private boolean isCallPermissionGranted = false;
+    //for_recording
+    private boolean isStorageWritePermissionGranted = false;
+    private boolean isStorageReadPermissionGranted = false;
 
     //AlertDialogBox
     private ImageButton cancelBtn;
@@ -119,6 +124,14 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     //image slider
     private ViewPager2 viewPager2;
     private Handler sliderHandler = new Handler();
+
+    //Emergency Flags
+    private boolean isEmergencyOn = false;
+
+    //start Recording on SOS
+    private boolean startRecording = true;
+    private boolean stopRecording = true;
+    long timeWhenPaused = 0;
 
 
     @Override
@@ -141,33 +154,68 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                 replaceFragment(new MapFragment());
                 binding.fragmentTitle.setText("Track Me");
                 binding.fragmentTitleDesc.setText("Share live location with your Guardian");
-                binding.topView2.setVisibility(View.GONE);
                 binding.topView.setVisibility(View.VISIBLE);
                 binding.viewPagerImageSlider.setVisibility(View.VISIBLE);
+
+                if (isEmergencyOn) {
+                    binding.stopUpdatesBtn.setVisibility(View.VISIBLE);
+                    changeFabToRegular();
+                    binding.floatingActionButton.setEnabled(false);
+                } else {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    binding.floatingActionButton.setEnabled(true);
+                }
+
 
             } else if (itemId == R.id.call) {
                 replaceFragment(new CallFragment());
                 binding.fragmentTitle.setText("Call For Help");
                 binding.fragmentTitleDesc.setText("In case of an emergency, call an appropriate number for help.");
-                binding.topView2.setVisibility(View.GONE);
                 binding.topView.setVisibility(View.VISIBLE);
                 binding.viewPagerImageSlider.setVisibility(View.GONE);
 
+                if (isEmergencyOn) {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    changeFabToRed();
+                    binding.floatingActionButton.setEnabled(true);
+                } else {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    binding.floatingActionButton.setEnabled(true);
+                }
+
+
             } else if (itemId == R.id.chat) {
                 replaceFragment(new ChatFragment());
-                binding.fragmentTitle.setText("Chat With Guardian");
-                binding.fragmentTitleDesc.setText("Start a one-to-one chat with your guardian.");
-                binding.topView2.setVisibility(View.VISIBLE);
+                binding.fragmentTitle.setText("Anonymous Recording");
+                binding.fragmentTitleDesc.setText("Anonymously record your surrounding without notifying others.");
                 binding.topView.setVisibility(View.VISIBLE);
                 binding.viewPagerImageSlider.setVisibility(View.GONE);
+
+                if (isEmergencyOn) {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    changeFabToRed();
+                    binding.floatingActionButton.setEnabled(true);
+                } else {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    binding.floatingActionButton.setEnabled(true);
+                }
 
             } else if (itemId == R.id.profile) {
                 replaceFragment(new ProfileFragment());
                 binding.fragmentTitle.setText("Your Profile");
                 binding.fragmentTitleDesc.setText("Take a look at your profile, be updated.");
-                binding.topView2.setVisibility(View.GONE);
                 binding.topView.setVisibility(View.GONE);
                 binding.viewPagerImageSlider.setVisibility(View.GONE);
+
+                if (isEmergencyOn) {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    changeFabToRed();
+                    binding.floatingActionButton.setEnabled(true);
+                } else {
+                    binding.stopUpdatesBtn.setVisibility(View.GONE);
+                    binding.floatingActionButton.setEnabled(true);
+                }
+
             }
             return true;
         });
@@ -175,7 +223,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     }
 
 
-    private void init(){
+    private void init() {
         user = FirebaseAuth.getInstance().getCurrentUser();
         firebaseAuth = FirebaseAuth.getInstance();
         getPhoneNumberFromFirebase();
@@ -183,26 +231,38 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         viewPager2 = binding.viewPagerImageSlider;
 
 
-        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
-            @Override
-            public void onActivityResult(Map<String, Boolean> result) {
-                if (result.get(Manifest.permission.SEND_SMS)!=null){
-                    isSMSPermissionGranted = result.get(Manifest.permission.SEND_SMS);
-                }if (result.get(Manifest.permission.CALL_PHONE)!=null){
-                    isSMSPermissionGranted = result.get(Manifest.permission.CALL_PHONE);
-                }if (result.get(Manifest.permission.RECORD_AUDIO)!=null){
-                    isSMSPermissionGranted = result.get(Manifest.permission.RECORD_AUDIO);
-                }
+        activityResultLauncher = registerForActivityResult(new
+                ActivityResultContracts.RequestMultiplePermissions(), result -> {
+
+            if (result.get(Manifest.permission.SEND_SMS) != null) {
+                isSMSPermissionGranted = result.get(Manifest.permission.SEND_SMS);
             }
+            if (result.get(Manifest.permission.CALL_PHONE) != null) {
+                isCallPermissionGranted = result.get(Manifest.permission.CALL_PHONE);
+            }
+            if (result.get(Manifest.permission.RECORD_AUDIO) != null) {
+                isRecordPermissionGranted = result.get(Manifest.permission.RECORD_AUDIO);
+            }
+
+            //for-record
+            if (result.get(Manifest.permission.READ_EXTERNAL_STORAGE) != null) {
+                isStorageReadPermissionGranted = result.get(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+            if (result.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) != null) {
+                isStorageWritePermissionGranted = result.get(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+
         });
+
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         //AlertDialogBox
-        View alertDialogBox = LayoutInflater.from(this).inflate(R.layout.custom_dialog_layout,null);
+        View alertDialogBox = LayoutInflater.from(this).inflate(R.layout.custom_dialog_layout, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setView(alertDialogBox);
 
-        cancelBtn = (ImageButton)alertDialogBox.findViewById(R.id.cancelBtn);
+        cancelBtn = (ImageButton) alertDialogBox.findViewById(R.id.cancelBtn);
         okBtn = (Button) alertDialogBox.findViewById(R.id.okBtn);
         dialog = alertDialog.create();
 
@@ -224,10 +284,10 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         lastUpdate = System.currentTimeMillis();
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (sensor==null){
+        if (sensor == null) {
             Toast.makeText(this, "No Accelerometer detected in device!", Toast.LENGTH_SHORT).show();
             finish();
-        }else {
+        } else {
             sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
@@ -236,35 +296,50 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
 
     }
 
-    //Vibration Generation methods
-    private void generateVibration(){
-        if (!vibrator.hasVibrator()){
-            return;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            vibrator.vibrate(VibrationEffect.createOneShot(1000,VibrationEffect.DEFAULT_AMPLITUDE));
-        }else {
-            long[] vibrationPattern = {0,200,0,500};
-            vibrator.vibrate(vibrationPattern,-1);
-        }
-    }
-
-    private void policeCall(){
-        String ambCall = "9146911950";
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse("tel:"+ambCall));
-        startActivity(intent);
-    }
-
-
     private void onClickListener() {
-        
+
         binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                detectLocation();
-                generateVibration();
-                showDialogBox();
+
+
+                if (isEmergencyOn){
+                    stopRepeating();
+                    isEmergencyOn = false;
+                    startRecording = false;
+                    binding.floatingActionButton.setEnabled(true);
+                    changeFabToRegular();
+                    checkRecordingPermissions();
+                    Toast.makeText(UserXHomeActivity.this, "Stopped Taking snap", Toast.LENGTH_SHORT).show();
+
+                }else {
+                    isEmergencyOn = true;
+//                detectLocation();
+                    checkForCameraPermissions();
+
+                    checkRecordingPermissions();
+
+                    binding.stopUpdatesBtn.setVisibility(View.VISIBLE);
+                    binding.floatingActionButton.setEnabled(false);
+
+                    generateVibration();
+                    showDialogBox();
+                }
+
+            }
+        });
+
+        binding.stopUpdatesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopRepeating();
+
+                binding.stopUpdatesBtn.setVisibility(View.GONE);
+                isEmergencyOn = false;
+                startRecording = false;
+                checkRecordingPermissions();
+                binding.floatingActionButton.setEnabled(true);
+                Toast.makeText(UserXHomeActivity.this, "Stopped Taking snap", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -285,19 +360,55 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
             }
         });
 
-
     }
 
-    private void showDialogBox(){
+    private void changeFabToRed(){
+        binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(
+                getApplicationContext(), R.drawable.ic_cancel));
+        int color = Color.argb(100, 255, 0, 0);
+        binding.floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(color));
+    }
+    private void changeFabToRegular(){
+        binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(
+                getApplicationContext(), R.drawable.ic_alert));
+        int color = Color.argb(100, 222, 212, 255);
+        binding.floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(color));
+    }
+
+
+    //Vibration Generation methods
+    private void generateVibration() {
+        if (!vibrator.hasVibrator()) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            long[] vibrationPattern = {0, 200, 0, 500};
+            vibrator.vibrate(vibrationPattern, -1);
+        }
+    }
+
+    private void policeCall() {
+        String ambCall = "9146911950";
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:" + ambCall));
+        startActivity(intent);
+    }
+
+
+
+    private void showDialogBox() {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
 
-    private void replaceFragment(Fragment fragment){
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);
         fragmentTransaction.commit();
+
     }
 
 
@@ -313,17 +424,17 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
 
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
+                    @Override
+                    public void onSuccess(Location location) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
 
-                LatLng latLng = new LatLng(latitude,longitude);
+                        LatLng latLng = new LatLng(latitude, longitude);
 //                Toast.makeText(UserXHomeActivity.this, ""+latLng, Toast.LENGTH_SHORT).show();
 
-                findAddress(latLng);
-            }
-        });
+                        findAddress(latLng);
+                    }
+                });
     }
 
     private void findAddress(LatLng latLng) {
@@ -347,15 +458,14 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
 //            String address = addresses.get(0).getAddressLine(0);  //complete address
-            String address = addresses.get(0).getFeatureName()+", "+addresses.get(0).getSubLocality()+", "+addresses.get(0).getLocality() +", " +addresses.get(0).getAdminArea()
-                    +", "+addresses.get(0).getPostalCode()
-                    +", "+ addresses.get(0).getCountryName() ;  //complete address
+            String address = addresses.get(0).getFeatureName() + ", " + addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea()
+                    + ", " + addresses.get(0).getPostalCode()
+                    + ", " + addresses.get(0).getCountryName();  //complete address
 
             sendSMS(lat, lon, address, gPhone);
 
-        }
-        catch (Exception e){
-            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d("Exceptlatlong", "findAddress: longitude " + e.getMessage());
 
         }
@@ -363,14 +473,14 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
 
     private void sendSMS(String latitude, String longitude, String address, String number) {
 
-        String geoUri = "I'm in Emergency!\n"+"http://maps.google.com/maps?q=loc:" + latitude + "," + longitude+" ("+address+")";
+        String geoUri = "I'm in Emergency!\n" + "http://maps.google.com/maps?q=loc:" + latitude + "," + longitude + " (" + address + ")";
 
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(number, null, geoUri, null, null);
 
     }
 
-    private void getPhoneNumberFromFirebase(){
+    private void getPhoneNumberFromFirebase() {
         FirebaseFirestore.getInstance().collection("Users")
                 .document(user.getUid())
                 .addSnapshotListener((value, error) -> {
@@ -385,7 +495,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                         return;
                     }
 
-                    if (value.exists()){
+                    if (value.exists()) {
 
                         gPhone = value.getString("gPhone");
 
@@ -401,7 +511,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        LatLng latLng = new LatLng(latitude,longitude);
+        LatLng latLng = new LatLng(latitude, longitude);
 
         Log.d("Latlang", latLng.toString());
 
@@ -423,53 +533,51 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         Toast.makeText(this, "Please turn on location...", Toast.LENGTH_SHORT).show();
     }
 
-    private void checkPermissions() {
-        Dexter.withContext(this)
-                .withPermission(Manifest.permission.SEND_SMS)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
 
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                        if (permissionDeniedResponse.isPermanentlyDenied()){
-                            Toast.makeText(UserXHomeActivity.this, "This app needs the SMS permission, please accept to use location functionality", Toast.LENGTH_SHORT).show();
-                        }else {
-                            Toast.makeText(UserXHomeActivity.this, "Permissions denied", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                        permissionToken.continuePermissionRequest();
-                    }
-                }).check();
-    }
-
-    private void requestPermissions(){
+    private void requestPermissions() {
         isSMSPermissionGranted = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS)
                 == PackageManager.PERMISSION_GRANTED;
+
         isCallPermissionGranted = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CALL_PHONE)
                 == PackageManager.PERMISSION_GRANTED;
+
         isRecordPermissionGranted = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED;
 
+        //for-recording
+        isStorageReadPermissionGranted = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+
+        isStorageWritePermissionGranted = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+
+
         List<String> permissionRequest = new ArrayList<String>();
 
-        if (!isSMSPermissionGranted){
+        if (!isSMSPermissionGranted) {
             permissionRequest.add(Manifest.permission.SEND_SMS);
-        }if (!isCallPermissionGranted){
+        }
+        if (!isCallPermissionGranted) {
             permissionRequest.add(Manifest.permission.CALL_PHONE);
-        }if (!isRecordPermissionGranted){
+        }
+        if (!isRecordPermissionGranted) {
             permissionRequest.add(Manifest.permission.RECORD_AUDIO);
         }
 
-        if (!permissionRequest.isEmpty()){
+        //for-record
+        if (!isStorageReadPermissionGranted) {
+            permissionRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (!isStorageWritePermissionGranted) {
+            permissionRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (!permissionRequest.isEmpty()) {
             activityResultLauncher.launch(permissionRequest.toArray(new String[0]));
         }
     }
@@ -478,19 +586,19 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     //shake feature
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             float[] values = sensorEvent.values;
-            float x= values[0];
-            float y= values[1];
-            float z= values[2];
+            float x = values[0];
+            float y = values[1];
+            float z = values[2];
 
             float EG = SensorManager.GRAVITY_EARTH;
-            float devAccel = (x*x+y*y+z*z)/(EG*EG);
+            float devAccel = (x * x + y * y + z * z) / (EG * EG);
 
-            if (devAccel>=150){
-                actualTime=System.currentTimeMillis();
-                if ((actualTime-lastUpdate)>5000){
-                    lastUpdate=actualTime;
+            if (devAccel >= 150) {
+                actualTime = System.currentTimeMillis();
+                if ((actualTime - lastUpdate) > 5000) {
+                    lastUpdate = actualTime;
 
                     Toast.makeText(this, "Shake Detected!", Toast.LENGTH_SHORT).show();
                     showDialogBox();
@@ -509,16 +617,15 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
 
     }
 
-
     //Image Slider
-    private void imageSlider(){
+    private void imageSlider() {
         List<SliderItem> sliderItemList = new ArrayList<>();
-        sliderItemList.add(new SliderItem(R.drawable.ic_child));
-        sliderItemList.add(new SliderItem(R.drawable.ic_women));
-        sliderItemList.add(new SliderItem(R.drawable.ic_police));
-        sliderItemList.add(new SliderItem(R.drawable.ic_ambulance));
+        sliderItemList.add(new SliderItem(R.drawable.we_are_strong_together_2));
+        sliderItemList.add(new SliderItem(R.drawable.safety_is_small_investment_for_rich_future));
+        sliderItemList.add(new SliderItem(R.drawable.safety_starts_with_aweareness_awareness_starts_with_you));
+        sliderItemList.add(new SliderItem(R.drawable.stay_safe_and_healthy));
 
-        viewPager2.setAdapter(new SliderAdapter(sliderItemList,viewPager2));
+        viewPager2.setAdapter(new SliderAdapter(sliderItemList, viewPager2));
         viewPager2.setClipToPadding(false);
         viewPager2.setClipChildren(false);
         viewPager2.setOffscreenPageLimit(3);
@@ -529,8 +636,8 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
             @Override
             public void transformPage(@NonNull View page, float position) {
-                float r = 1-Math.abs(position);
-                page.setScaleY(0.85f+r*0.15f);
+                float r = 1 - Math.abs(position);
+                page.setScaleY(0.85f + r * 0.15f);
             }
         });
         viewPager2.setPageTransformer(compositePageTransformer);
@@ -539,7 +646,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 sliderHandler.removeCallbacks(sliderRunnable);
-                sliderHandler.postDelayed(sliderRunnable,3500);
+                sliderHandler.postDelayed(sliderRunnable, 3500);
             }
         });
     }
@@ -547,7 +654,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     private Runnable sliderRunnable = new Runnable() {
         @Override
         public void run() {
-            viewPager2.setCurrentItem(viewPager2.getCurrentItem()+1);
+            viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
         }
     };
 
@@ -560,6 +667,177 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     @Override
     protected void onResume() {
         super.onResume();
-        sliderHandler.postDelayed(sliderRunnable,3500);
+        sliderHandler.postDelayed(sliderRunnable, 3500);
     }
+
+
+    //check Permissions for Capturing snaps
+    public void checkForCameraPermissions() {
+        Dexter.withContext(this)
+                .withPermissions(Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+
+//                            TakeSnaps takeSnaps = new TakeSnaps();  //Capture images on SOS clicked
+//                            takeSnaps.startCapturingSnaps(UserXHomeActivity.this);
+
+                            startRepeating();
+
+                        }
+
+                        // check for permanent denial of any permission
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+
+                            // permission is denied permanently, navigate user to app settings
+                            showSettingsDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                })
+                .check();
+
+    }
+
+
+    //Snap Task Repeater
+    private Handler repeatSnapHandler = new Handler();
+
+    //Repeating Task
+    public void startRepeating() {
+        //mHandler.postDelayed(mToastRunnable, 5000);
+        snapRunnable.run();
+    }
+
+    public void stopRepeating() {
+        repeatSnapHandler.removeCallbacks(snapRunnable);
+    }
+
+    public Runnable snapRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int i = 0;
+            Log.d("Snap Delay Test: ", "success");
+
+//            checkForCameraPermissions();
+
+            TakeSnaps takeSnaps = new TakeSnaps();  //Capture images on SOS clicked
+            takeSnaps.startCapturingSnaps(UserXHomeActivity.this);
+
+            repeatSnapHandler.postDelayed(this, 5000);
+        }
+    };
+
+
+
+    private void checkRecordingPermissions() {
+
+        Dexter.withContext(this)
+                .withPermissions(Manifest.permission.RECORD_AUDIO,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            startRecording();
+                        }
+
+                        // check for permanent denial of any permission
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+
+                            // permission is denied permenantly, navigate user to app settings
+                            showSettingsDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                })
+                .onSameThread()
+                .check();
+
+    }
+
+    private void showSettingsDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Need Permissions");
+        builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
+        builder.setPositiveButton("GOTO SETTINGS", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                openSettings();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void openSettings() {
+
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+
+        Uri uri = Uri.fromParts("package", MainActivity.PACKAGE_NAME, null);
+        intent.setData(uri);
+        startActivityForResult(intent, 101);
+    }
+
+    public void startRecording() {
+
+        onRecord(startRecording);
+        startRecording = !startRecording;
+    }
+
+    @SuppressLint("ResourceAsColor")
+    public void onRecord(boolean startRecording) {
+
+        Intent intent = new Intent(this, RecordingService.class);
+
+        if(startRecording){
+
+
+            Toast.makeText(this, "Recording started...", Toast.LENGTH_SHORT).show();
+
+            //Recordings Folder Access
+            ContextWrapper contextWrapper = new ContextWrapper(this);
+            File music = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                music = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_RECORDINGS);
+            }
+
+            Log.d("Recording Logs: ", "");
+
+            UserXHomeActivity.this.startService(intent);
+            UserXHomeActivity.this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        }else {
+            Toast.makeText(this, "Recording Stopped...", Toast.LENGTH_SHORT).show();
+            UserXHomeActivity.this.stopService(intent);
+
+        }
+    }
+
 }
+
+
+
+
+
+

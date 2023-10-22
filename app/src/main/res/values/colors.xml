@@ -6,12 +6,14 @@
     <color name="color_green_light">#00952E</color>
     <color name="primary_color">#6C5DD2</color>
     <color name="secondary_color">#707070</color>
-    <color name="text_color">#8c8296</color>
+    <color name="text_color">#534E59</color>
     <color name="text_color2">#b5bcbc</color>
     <color name="primary_background">#F1EEF7</color>
     <color name="colorRed">#FF0600</color>
     <color name="lavendor">#8692F7</color>
+    <color name="fabColor">#DED4FF</color>
     <color name="sos_btn">#FF9595</color>
+    <color name="gray_color">#33000000</color>
 
     <color name="test_color">#39FFFFFF</color>
 

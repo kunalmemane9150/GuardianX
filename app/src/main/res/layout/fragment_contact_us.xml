@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment.ContactUsFragment">
+
+
+    <TextView
+        android:id="@+id/contactUsTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Contact Us"
+        android:textSize="22sp"
+        android:fontFamily="@font/poppins_medium"
+        android:textColor="@color/primary_color"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/contactUsTv">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/linearLayoutTop">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp">
+
+                <TextView
+                    android:id="@+id/subjectTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Subject"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textSize="18sp"
+                    android:textColor="#6C5DD2"/>
+
+                <EditText
+                    android:id="@+id/subjectEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:ems="10"
+                    android:hint="Enter you feedback"
+                    android:padding="12dp"
+                    android:maxLength="150"
+                    android:background="@drawable/edit_text_background"
+                    android:inputType="textEmailAddress"
+                    android:gravity="center"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="#707070"
+                    android:textColorHint="#707070"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp">
+
+                <TextView
+                    android:id="@+id/descriptionTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Description"
+                    android:fontFamily="@font/poppins_medium"
+                    android:textSize="18sp"
+                    android:textColor="#6C5DD2"/>
+
+                <EditText
+                    android:id="@+id/descriptionEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Describe your feedback"
+                    android:padding="12dp"
+                    android:background="@drawable/edit_text_background"
+                    android:inputType="textMultiLine"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="#707070"
+                    android:textColorHint="#707070"
+                    android:layout_marginTop="8dp"
+                    android:lines="6"
+                    android:gravity="top|center"
+                    android:scrollbars="vertical"
+                    android:maxLength="500" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/sendEmailBtn"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                style="@style/Widget.Material3.Button"
+                android:gravity="center"
+                android:fontFamily="@font/poppins"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:textSize="18sp"
+                android:text="Send"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

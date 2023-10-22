@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MenuBarActivity"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".RecordingsAndSnapsActivity">
+
 
     <TextView
         android:id="@+id/activityName"
@@ -13,12 +14,13 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:fontFamily="@font/poppins_semibold"
-        android:text="Legals"
+        android:text="Recordings &amp; Snaps"
         android:textSize="22sp"
         android:textColor="@color/primary_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
@@ -32,17 +34,12 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Contact Us" />
+            android:text="Recordings" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Privacy"/>
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Terms"/>
+            android:text="Snaps"/>
 
     </com.google.android.material.tabs.TabLayout>
 
@@ -52,24 +49,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
-    <TextView
-        android:id="@+id/appVersionTv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_light"
-        android:text="GuardianX v1.0.0"
-        android:textColor="@color/text_color"
-        android:textSize="12sp"
-        android:background="@color/white"
-        android:gravity="center"
-        android:padding="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
 

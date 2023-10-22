@@ -3,12 +3,154 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragment.ChatFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/recordingsLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Chat" />
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:elevation="50dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/background_rounded_corner_stroke"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/ambulanceBtn"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/background_call_icon"
+                    android:src="@drawable/ic_mic_filled" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0.5"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:id="@+id/recordingsTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:gravity="start"
+                android:fontFamily="@font/poppins"
+                android:text="Recordings &amp; Snaps"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:gravity="start"
+                android:fontFamily="@font/poppins"
+                android:text="Tap to see recordings"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/openRecordingsBtn"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/background_open_icon"
+                    android:src="@drawable/ic_arrow_right" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/recordFab"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:text="Start Recording"
+        android:backgroundTint="@color/black"
+        android:fontFamily="@font/poppins"
+        android:drawableLeft="@drawable/ic_mic_filled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="100dp" />
+
+    <Chronometer
+        android:id="@+id/chronometerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="35dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/poppins"
+        app:layout_constraintStart_toStartOf="@id/recordProgressBar"
+        app:layout_constraintEnd_toEndOf="@id/recordProgressBar"
+        app:layout_constraintTop_toTopOf="@id/recordProgressBar"
+        app:layout_constraintBottom_toBottomOf="@id/recordProgressBar"/>
+
+
+    <TextView
+        android:id="@+id/recordingStatusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:fontFamily="@font/poppins"
+        android:text="Tap the button to start Recording"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/recordFab"
+        app:layout_constraintTop_toBottomOf="@id/chronometerView"/>
+
+    <ProgressBar
+        android:id="@+id/recordProgressBar"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:indeterminate="false"
+        android:progress="0"
+        android:max="100"
+        android:progressDrawable="@drawable/progress_bar"
+        android:background="@drawable/background_progress_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/recordFab"
+        />
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

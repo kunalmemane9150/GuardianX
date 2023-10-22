@@ -6,19 +6,26 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import android.os.Bundle;
 
 import in.newgenai.guardianx.Adapter.ContactUsTabAdapter;
-import in.newgenai.guardianx.Fragment.ContactUsFragment;
-import in.newgenai.guardianx.Fragment.PrivacyPolicyFragment;
-import in.newgenai.guardianx.Fragment.TermsFragment;
-import in.newgenai.guardianx.databinding.ActivityMenuBarBinding;
+import in.newgenai.guardianx.Fragment.RecordingsFragment;
+import in.newgenai.guardianx.Fragment.SnapsFragment;
+import in.newgenai.guardianx.databinding.ActivityRecordingsAndSnapsBinding;
 
-public class MenuBarActivity extends AppCompatActivity {
+public class RecordingsAndSnapsActivity extends AppCompatActivity {
 
-    private ActivityMenuBarBinding binding;
+    private ActivityRecordingsAndSnapsBinding binding;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMenuBarBinding.inflate(getLayoutInflater());
+        binding = ActivityRecordingsAndSnapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        init();
+
+    }
+    private void init(){
 
         binding.tabLayout.setupWithViewPager(binding.viewPager);
 
@@ -26,9 +33,9 @@ public class MenuBarActivity extends AppCompatActivity {
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
         contactTabAdapter.clearList();
-        contactTabAdapter.addFragment(new ContactUsFragment(),"Contact");
-        contactTabAdapter.addFragment(new PrivacyPolicyFragment(),"Privacy");
-        contactTabAdapter.addFragment(new TermsFragment(),"Terms");
+        contactTabAdapter.addFragment(new RecordingsFragment(),"Recordings");
+        contactTabAdapter.addFragment(new SnapsFragment(),"Snaps");
         binding.viewPager.setAdapter(contactTabAdapter);
+
     }
 }

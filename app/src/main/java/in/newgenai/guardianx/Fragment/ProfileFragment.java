@@ -59,6 +59,7 @@ import java.util.Map;
 import in.newgenai.guardianx.LoginActivity;
 import in.newgenai.guardianx.R;
 import in.newgenai.guardianx.UserXHomeActivity;
+import in.newgenai.guardianx.databinding.ActivityUserXhomeBinding;
 import in.newgenai.guardianx.databinding.FragmentCallBinding;
 import in.newgenai.guardianx.databinding.FragmentProfileBinding;
 
@@ -75,6 +76,8 @@ public class ProfileFragment extends Fragment implements LocationListener  {
 
     //permission array
     private String[] storagePermissions;
+
+
     //image uri
     private Uri image_uri;
     private Bitmap bitmap;
@@ -100,6 +103,8 @@ public class ProfileFragment extends Fragment implements LocationListener  {
 
         init();
         onClickListner();
+
+
 //        loadUserInfo();
 
         return binding.getRoot();

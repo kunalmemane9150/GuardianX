@@ -16,11 +16,16 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:allowBackup="true"
@@ -32,6 +37,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GuardianX"
         tools:targetApi="31">
+        <activity
+            android:name=".OpenSnapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RecordingsAndSnapsActivity"
+            android:exported="false" />
         <activity
             android:name=".MenuBarActivity"
             android:exported="false" />
@@ -64,6 +75,7 @@
         </activity>
 
         <service android:name=".SpeechServices" />
+        <service android:name=".Services.RecordingService" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -71,6 +83,17 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

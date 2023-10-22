@@ -4,6 +4,7 @@
     <item
         android:id="@+id/location"
         android:title="Track me"
+        android:enabled="true"
         android:icon="@drawable/ic_location"/>
     <item
         android:id="@+id/call"
@@ -18,7 +19,7 @@
     <item
         android:id="@+id/chat"
         android:title="Chat"
-        android:icon="@drawable/ic_chat"/>
+        android:icon="@drawable/ic_mic_empty"/>
     <item
         android:id="@+id/profile"
         android:title="Profile"

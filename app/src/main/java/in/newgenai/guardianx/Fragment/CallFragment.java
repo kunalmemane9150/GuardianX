@@ -30,15 +30,11 @@ public class CallFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentCallBinding.inflate(inflater, container, false);
 
-        init();
         checkPermissions();
         return binding.getRoot();
 
     }
 
-    private void init(){
-
-    }
 
     private void checkPermissions(){
         Dexter.withContext(getContext())

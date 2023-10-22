@@ -22,10 +22,15 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore;
     private FirebaseAuth auth;
 
+    public static String PACKAGE_NAME;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PACKAGE_NAME = getApplicationContext().getPackageName();
+
 
         auth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
