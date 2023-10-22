@@ -131,7 +131,12 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     //start Recording on SOS
     private boolean startRecording = true;
     private boolean stopRecording = true;
-    long timeWhenPaused = 0;
+
+
+    MapFragment mapFragment = new MapFragment();
+    CallFragment callFragment = new CallFragment();
+    ChatFragment chatFragment =new ChatFragment();
+    ProfileFragment profileFragment = new ProfileFragment();
 
 
     @Override
@@ -149,9 +154,11 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         replaceFragment(new MapFragment());
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+
             int itemId = item.getItemId();
+
             if (itemId == R.id.location) {
-                replaceFragment(new MapFragment());
+                replaceFragment(mapFragment);
                 binding.fragmentTitle.setText("Track Me");
                 binding.fragmentTitleDesc.setText("Share live location with your Guardian");
                 binding.topView.setVisibility(View.VISIBLE);
@@ -162,13 +169,14 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                     changeFabToRegular();
                     binding.floatingActionButton.setEnabled(false);
                 } else {
+                    changeFabToRegular();
                     binding.stopUpdatesBtn.setVisibility(View.GONE);
                     binding.floatingActionButton.setEnabled(true);
                 }
 
 
             } else if (itemId == R.id.call) {
-                replaceFragment(new CallFragment());
+                replaceFragment(callFragment);
                 binding.fragmentTitle.setText("Call For Help");
                 binding.fragmentTitleDesc.setText("In case of an emergency, call an appropriate number for help.");
                 binding.topView.setVisibility(View.VISIBLE);
@@ -179,13 +187,14 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                     changeFabToRed();
                     binding.floatingActionButton.setEnabled(true);
                 } else {
+                    changeFabToRegular();
                     binding.stopUpdatesBtn.setVisibility(View.GONE);
                     binding.floatingActionButton.setEnabled(true);
                 }
 
 
             } else if (itemId == R.id.chat) {
-                replaceFragment(new ChatFragment());
+                replaceFragment(chatFragment);
                 binding.fragmentTitle.setText("Anonymous Recording");
                 binding.fragmentTitleDesc.setText("Anonymously record your surrounding without notifying others.");
                 binding.topView.setVisibility(View.VISIBLE);
@@ -196,12 +205,13 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                     changeFabToRed();
                     binding.floatingActionButton.setEnabled(true);
                 } else {
+                    changeFabToRegular();
                     binding.stopUpdatesBtn.setVisibility(View.GONE);
                     binding.floatingActionButton.setEnabled(true);
                 }
 
             } else if (itemId == R.id.profile) {
-                replaceFragment(new ProfileFragment());
+                replaceFragment(profileFragment);
                 binding.fragmentTitle.setText("Your Profile");
                 binding.fragmentTitleDesc.setText("Take a look at your profile, be updated.");
                 binding.topView.setVisibility(View.GONE);
@@ -212,6 +222,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                     changeFabToRed();
                     binding.floatingActionButton.setEnabled(true);
                 } else {
+                    changeFabToRegular();
                     binding.stopUpdatesBtn.setVisibility(View.GONE);
                     binding.floatingActionButton.setEnabled(true);
                 }
@@ -681,11 +692,7 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if (report.areAllPermissionsGranted()) {
 
-//                            TakeSnaps takeSnaps = new TakeSnaps();  //Capture images on SOS clicked
-//                            takeSnaps.startCapturingSnaps(UserXHomeActivity.this);
-
                             startRepeating();
-
                         }
 
                         // check for permanent denial of any permission

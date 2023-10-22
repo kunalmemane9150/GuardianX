@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import in.newgenai.guardianx.Adapter.FileViewerAdapter;
 import in.newgenai.guardianx.Database.DBRecordHelper;
 import in.newgenai.guardianx.Model.RecordingItemModel;
-import in.newgenai.guardianx.R;
-import in.newgenai.guardianx.databinding.FragmentCallBinding;
 import in.newgenai.guardianx.databinding.FragmentRecordingsBinding;
 
 public class RecordingsFragment extends Fragment {
@@ -26,7 +24,6 @@ public class RecordingsFragment extends Fragment {
 
     DBRecordHelper dbRecordHelper;
     private FileViewerAdapter fileViewerAdapter;
-
     ArrayList<RecordingItemModel> arrayListAudio;
 
     @Override
@@ -45,10 +42,8 @@ public class RecordingsFragment extends Fragment {
 
         return binding.getRoot();
     }
-
     private void init() {
         dbRecordHelper = new DBRecordHelper(getContext());
-
         binding.recordingsRv.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -64,7 +59,5 @@ public class RecordingsFragment extends Fragment {
             fileViewerAdapter = new FileViewerAdapter(getActivity(), arrayListAudio, linearLayoutManager);
             binding.recordingsRv.setAdapter(fileViewerAdapter);
         }
-
-
     }
 }

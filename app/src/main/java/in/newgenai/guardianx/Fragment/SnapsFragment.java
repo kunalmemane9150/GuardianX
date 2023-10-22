@@ -95,10 +95,7 @@ public class SnapsFragment extends Fragment {
                         permissionToken.continuePermissionRequest();
                     }
                 }).check();
-
     }
-
-
     @Override
     public void onResume() {
         super.onResume();

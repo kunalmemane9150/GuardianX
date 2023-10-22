@@ -277,6 +277,7 @@
                             android:ems="10"
                             android:background="@drawable/edit_text_background"
                             android:gravity="center"
+                            app:ccp_showNameCode="false"
                             android:fontFamily="@font/poppins"
                             android:textColor="#707070"
                             android:textColorHint="#707070"

@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +46,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.Objects;
+
 import in.newgenai.guardianx.R;
 import in.newgenai.guardianx.databinding.FragmentMapBinding;
 
@@ -63,6 +66,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean gps_enabled = false;
     private boolean network_enabled = false;
 
+    //delay map loading
+    private final Handler handler = new Handler();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,8 +80,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return binding.getRoot();
     }
 
-    private void init(){
-        supportMapFragment=(SupportMapFragment) getChildFragmentManager()
+    private void init() {
+        supportMapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.googleMap);
 
         supportMapFragment.getMapAsync(this);
@@ -91,11 +96,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .getSystemService(Context.LOCATION_SERVICE);
         try {
             gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         try {
             network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         if (!gps_enabled && !network_enabled) {
             enableLocation();
@@ -190,7 +197,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         Task<LocationSettingsResponse> locationSettingsResponseTask = client.checkLocationSettings(request);
         locationSettingsResponseTask
-                .addOnSuccessListener(locationSettingsResponse -> startLocationUpdates())
+                .addOnSuccessListener(locationSettingsResponse ->
+                        startLocationUpdates()
+                )
                 .addOnFailureListener(e -> {
                     if (e instanceof ResolvableApiException) {
                         ResolvableApiException apiException = (ResolvableApiException) e;
@@ -205,14 +214,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            return;
+
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        } else {
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback,
+                    Looper.getMainLooper());
         }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback,
-                Looper.getMainLooper());
+
     }
 
     private void stopLocationUpdates() {
@@ -238,6 +248,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
     }
-    
-    
+
+
 }
