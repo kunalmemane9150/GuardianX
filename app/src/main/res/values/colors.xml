@@ -10,6 +10,8 @@
     <color name="text_color2">#b5bcbc</color>
     <color name="primary_background">#F1EEF7</color>
     <color name="colorRed">#FF0600</color>
+    <color name="colorRedTopView">#33FF0600</color>
+    <color name="chip_color">#4D6C5DD2</color>
     <color name="lavendor">#8692F7</color>
     <color name="fabColor">#DED4FF</color>
     <color name="sos_btn">#FF9595</color>

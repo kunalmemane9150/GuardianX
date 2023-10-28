@@ -68,6 +68,7 @@ dependencies {
 
     //animations
 //    implementation 'com.github.gayanvoice:android-animations:1.0.2'
+    implementation 'com.airbnb.android:lottie:6.1.0'
 
 
 

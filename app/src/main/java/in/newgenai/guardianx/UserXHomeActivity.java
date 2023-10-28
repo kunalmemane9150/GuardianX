@@ -1,6 +1,6 @@
 package in.newgenai.guardianx;
 
-import static java.security.AccessController.getContext;
+import static in.newgenai.guardianx.R.raw.alarm;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -26,6 +26,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -36,12 +39,14 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.MediaParser;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -52,9 +57,12 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.model.KeyPath;
+import com.airbnb.lottie.value.LottieFrameInfo;
+import com.airbnb.lottie.value.SimpleLottieValueCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -62,18 +70,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.File;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -132,6 +135,10 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
     private boolean startRecording = true;
     private boolean stopRecording = true;
 
+    //Alarm
+    private boolean isAlarm = true;
+    private MediaPlayer mediaPlayer;
+    private AudioManager audioManager;
 
     MapFragment mapFragment = new MapFragment();
     CallFragment callFragment = new CallFragment();
@@ -239,6 +246,9 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         firebaseAuth = FirebaseAuth.getInstance();
         getPhoneNumberFromFirebase();
 
+       audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+
+
         viewPager2 = binding.viewPagerImageSlider;
 
 
@@ -325,9 +335,9 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
 
                 }else {
                     isEmergencyOn = true;
-//                detectLocation();
-                    checkForCameraPermissions();
+                    detectLocation();
 
+                    checkForCameraPermissions();
                     checkRecordingPermissions();
 
                     binding.stopUpdatesBtn.setVisibility(View.VISIBLE);
@@ -366,8 +376,25 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         binding.notificationIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDialogBox();
-                generateVibration();
+
+                if (isAlarm){
+                   startAlarm();
+                }else{
+                    stopAlarm();
+                }
+
+
+            }
+        });
+
+        binding.lottieAnimationAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isAlarm){
+                    startAlarm();
+                }else{
+                    stopAlarm();
+                }
             }
         });
 
@@ -405,6 +432,43 @@ public class UserXHomeActivity extends AppCompatActivity implements LocationList
         Intent intent = new Intent(Intent.ACTION_CALL);
         intent.setData(Uri.parse("tel:" + ambCall));
         startActivity(intent);
+    }
+
+
+
+    //Start Alarm
+    private void startAlarm(){
+        mediaPlayer = MediaPlayer.create(UserXHomeActivity.this, alarm);
+
+//        audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+
+        isAlarm = false;
+        mediaPlayer.start();
+        binding.notificationIcon.setBackgroundResource(R.drawable.ic_notification_filled);
+        binding.lottieAnimationAlert.addValueCallback(
+                new KeyPath("**"),
+                LottieProperty.COLOR_FILTER,
+                frameInfo -> new PorterDuffColorFilter(ContextCompat.getColor(
+                        UserXHomeActivity.this,R.color.colorRed)
+                        ,PorterDuff.Mode.SRC_ATOP)
+        );
+        Toast.makeText(UserXHomeActivity.this, "Emergency alarm started!", Toast.LENGTH_SHORT).show();
+
+    }
+
+    //stop alarm
+    private void stopAlarm(){
+        isAlarm = true;
+        mediaPlayer.stop();
+        binding.notificationIcon.setBackgroundResource(R.drawable.ic_notification);
+        binding.lottieAnimationAlert.addValueCallback(
+                new KeyPath("**"),
+                LottieProperty.COLOR_FILTER,
+                frameInfo -> new PorterDuffColorFilter(ContextCompat.getColor(
+                        UserXHomeActivity.this,R.color.primary_color)
+                        ,PorterDuff.Mode.SRC_ATOP)
+        );
+        Toast.makeText(UserXHomeActivity.this, "Emergency alarm stopped!", Toast.LENGTH_SHORT).show();
     }
 
 

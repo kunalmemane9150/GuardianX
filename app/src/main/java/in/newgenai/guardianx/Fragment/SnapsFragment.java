@@ -132,7 +132,9 @@ public class SnapsFragment extends Fragment {
         binding.recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener((view, path) -> startActivity(
-                new Intent(context, OpenSnapActivity.class).putExtra("parseData", path)));
+                new Intent(context, OpenSnapActivity.class)
+                        .putExtra("parseData", path))
+        );
 
     }
 
